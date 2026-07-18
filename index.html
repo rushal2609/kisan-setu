@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kisan Setu — Connecting Farms Directly to Markets</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#1A1613;
@@ -286,6 +287,36 @@
 
   footer{padding:44px 0; border-top:1px solid var(--line); font-size:0.85rem; color:rgba(26,22,19,0.55);}
   footer .wrap{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;}
+
+  /* ---------- AI CHAT WIDGET ---------- */
+  #chatToggle{
+    position:fixed; bottom:26px; right:26px; z-index:200;
+    width:60px; height:60px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--marigold); color:var(--field-dark); font-size:1.5rem;
+    box-shadow:0 8px 24px rgba(0,0,0,0.25);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease;
+  }
+  #chatToggle:hover{transform:scale(1.06);}
+  #chatPanel{
+    position:fixed; bottom:98px; right:26px; z-index:200;
+    width:340px; max-width:calc(100vw - 40px); height:440px;
+    background:var(--paper); border:1px solid var(--line); border-radius:18px;
+    box-shadow:0 16px 48px rgba(0,0,0,0.25);
+    display:none; flex-direction:column; overflow:hidden;
+  }
+  #chatPanel.open{display:flex;}
+  .chat-head{background:var(--field); color:var(--paper); padding:16px 18px;}
+  .chat-head strong{font-family:'Fraunces',serif; font-size:1.05rem;}
+  .chat-head span{display:block; font-size:0.76rem; color:rgba(246,241,228,0.65); margin-top:2px;}
+  .chat-body{flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:10px; background:var(--paper-dim);}
+  .chat-msg{max-width:85%; padding:9px 13px; border-radius:14px; font-size:0.87rem; line-height:1.4;}
+  .chat-msg.bot{background:var(--paper); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:4px;}
+  .chat-msg.user{background:var(--field); color:var(--paper); align-self:flex-end; border-bottom-right-radius:4px;}
+  .chat-msg.error{background:#f4d9d9; color:#7a2020; align-self:flex-start;}
+  .chat-input-row{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); background:var(--paper);}
+  .chat-input-row input{flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--line); font-family:'Inter',sans-serif; font-size:0.88rem;}
+  .chat-input-row button{background:var(--marigold); color:var(--field-dark); border:none; border-radius:10px; padding:0 16px; font-weight:700; cursor:pointer;}
 </style>
 </head>
 <body>
@@ -320,34 +351,34 @@
   <div class="wrap bridge-stage">
     <svg class="bridge-svg" viewBox="0 0 900 200" preserveAspectRatio="xMidYMid meet">
       <!-- ground line -->
-      <line x1="20" y1="160" x2="880" y2="160" stroke="rgba(246,241,228,0.18)" stroke-width="2"></line>
+      <line x1="20" y1="160" x2="880" y2="160" stroke="rgba(246,241,228,0.18)" stroke-width="2"/>
       <!-- bridge deck path (used for motion + visible line) -->
-      <path id="deckPath" d="M 90 150 C 260 60, 640 60, 810 150" fill="none" stroke="rgba(246,241,228,0.35)" stroke-width="3"></path>
-      <path class="cable" d="M 90 150 C 260 60, 640 60, 810 150" fill="none" stroke="var(--marigold)" stroke-width="1.5" opacity="0.7"></path>
+      <path id="deckPath" d="M 90 150 C 260 60, 640 60, 810 150" fill="none" stroke="rgba(246,241,228,0.35)" stroke-width="3"/>
+      <path class="cable" d="M 90 150 C 260 60, 640 60, 810 150" fill="none" stroke="var(--marigold)" stroke-width="1.5" opacity="0.7"/>
 
       <!-- Farm icon (left tower) -->
       <g transform="translate(60,110)">
-        <rect x="-6" y="0" width="60" height="46" rx="6" fill="var(--soil)"></rect>
-        <polygon points="-6,0 24,-26 54,0" fill="#8A5A34"></polygon>
-        <rect x="14" y="18" width="10" height="28" fill="var(--paper)" opacity="0.85"></rect>
+        <rect x="-6" y="0" width="60" height="46" rx="6" fill="var(--soil)"/>
+        <polygon points="-6,0 24,-26 54,0" fill="#8A5A34"/>
+        <rect x="14" y="18" width="10" height="28" fill="var(--paper)" opacity="0.85"/>
         <text x="24" y="70" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="rgba(246,241,228,0.75)">FARM</text>
       </g>
 
       <!-- Market icon (right tower) -->
       <g transform="translate(760,108)">
-        <rect x="-10" y="6" width="70" height="42" rx="6" fill="var(--bridge-blue)"></rect>
-        <rect x="-2" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"></rect>
-        <rect x="18" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"></rect>
-        <rect x="38" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"></rect>
+        <rect x="-10" y="6" width="70" height="42" rx="6" fill="var(--bridge-blue)"/>
+        <rect x="-2" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"/>
+        <rect x="18" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"/>
+        <rect x="38" y="16" width="14" height="14" fill="var(--paper)" opacity="0.8"/>
         <text x="25" y="70" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" fill="rgba(246,241,228,0.75)">MARKET</text>
       </g>
 
       <!-- flowing data badges along the bridge -->
       <g>
-        <circle class="flow-dot" r="7" fill="var(--marigold)" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"></circle>
-        <circle class="flow-dot d2" r="6" fill="#F0AE52" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"></circle>
-        <circle class="flow-dot d3" r="6" fill="var(--bridge-blue)" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"></circle>
-        <circle class="flow-dot d4" r="5" fill="#E8A33D" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"></circle>
+        <circle class="flow-dot" r="7" fill="var(--marigold)" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"/>
+        <circle class="flow-dot d2" r="6" fill="#F0AE52" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"/>
+        <circle class="flow-dot d3" r="6" fill="var(--bridge-blue)" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"/>
+        <circle class="flow-dot d4" r="5" fill="#E8A33D" style="offset-path:path('M 90 150 C 260 60, 640 60, 810 150');"/>
       </g>
 
       <text x="450" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" letter-spacing="2" fill="rgba(246,241,228,0.45)">PRICE · STORAGE · BUYER · TRANSPORT</text>
@@ -405,7 +436,7 @@
     <div class="why-grid">
       <div class="why-card">
         <span class="idx">01</span>
-        <h3>Real-time buyers &amp; prices, nearby</h3>
+        <h3>Real-time buyers & prices, nearby</h3>
         <p>Farmers see who's buying and at what price in their own block — not a city-wide average that hides the real deal on offer.</p>
       </div>
       <div class="why-card">
@@ -415,7 +446,7 @@
       </div>
       <div class="why-card">
         <span class="idx">03</span>
-        <h3>SMS &amp; voice — no smartphone required</h3>
+        <h3>SMS & voice — no smartphone required</h3>
         <p>A helpline call or a text message does everything the app does, so the poorest-connected farmer is never left out.</p>
       </div>
     </div>
@@ -460,12 +491,12 @@
       <h2>As IT/CSE students, this is where we build our real edge.</h2>
     </div>
     <div class="tech-grid">
-      <div class="tech-card"><span class="tag">App &amp; Frontend</span><h3>Android-first, low-end friendly</h3><p>Flutter / React Native, light on data, with a Hindi and regional-language UI from day one.</p></div>
-      <div class="tech-card"><span class="tag">Backend &amp; APIs</span><h3>Node.js / Django REST</h3><p>PostgreSQL database, hosted on scalable cloud — AWS or GCP free-tier to start.</p></div>
-      <div class="tech-card"><span class="tag">SMS &amp; Voice Layer</span><h3>No smartphone needed</h3><p>Twilio / SMS gateway plus IVR calls so farmers without a smartphone can list crops and get alerts.</p></div>
-      <div class="tech-card"><span class="tag">AI / ML Layer</span><h3>Price &amp; demand forecasting</h3><p>A model trained on mandi price data, plus a matching algorithm that ranks the best buyer or storage option.</p></div>
-      <div class="tech-card"><span class="tag">Maps &amp; Logistics</span><h3>Route planning</h3><p>Google Maps API for buyer and cold-storage distance, and routing to the nearest option.</p></div>
-      <div class="tech-card"><span class="tag">Data &amp; Security</span><h3>Trust by design</h3><p>Encrypted farmer data, OTP-based login, and cloud backups — the trust layer adoption depends on.</p></div>
+      <div class="tech-card"><span class="tag">App & Frontend</span><h3>Android-first, low-end friendly</h3><p>Flutter / React Native, light on data, with a Hindi and regional-language UI from day one.</p></div>
+      <div class="tech-card"><span class="tag">Backend & APIs</span><h3>Node.js / Django REST</h3><p>PostgreSQL database, hosted on scalable cloud — AWS or GCP free-tier to start.</p></div>
+      <div class="tech-card"><span class="tag">SMS & Voice Layer</span><h3>No smartphone needed</h3><p>Twilio / SMS gateway plus IVR calls so farmers without a smartphone can list crops and get alerts.</p></div>
+      <div class="tech-card"><span class="tag">AI / ML Layer</span><h3>Price & demand forecasting</h3><p>A model trained on mandi price data, plus a matching algorithm that ranks the best buyer or storage option.</p></div>
+      <div class="tech-card"><span class="tag">Maps & Logistics</span><h3>Route planning</h3><p>Google Maps API for buyer and cold-storage distance, and routing to the nearest option.</p></div>
+      <div class="tech-card"><span class="tag">Data & Security</span><h3>Trust by design</h3><p>Encrypted farmer data, OTP-based login, and cloud backups — the trust layer adoption depends on.</p></div>
     </div>
   </div>
 </section>
@@ -479,13 +510,13 @@
       <p>Revenue is a small percentage of real transactions, not ads or hype — so it scales naturally with usage.</p>
     </div>
     <table class="rev-table">
-      <tbody><tr><td>Transaction commission</td><td>2–4% commission from the buyer or mandi on every successful sale made through Kisan Setu.</td></tr>
+      <tr><td>Transaction commission</td><td>2–4% commission from the buyer or mandi on every successful sale made through Kisan Setu.</td></tr>
       <tr><td>Cold storage listing fee</td><td>Storage owners pay a small monthly fee to list live availability.</td></tr>
       <tr><td>Kisan Setu Pro</td><td>A paid tier for farmers with price alerts, crop-planning advice, and a credit-history report (~₹99/month).</td></tr>
       <tr><td>Logistics partner fee</td><td>A commission from the transport and trucking partners we route business to.</td></tr>
-      <tr><td>Govt. &amp; NGO partnerships</td><td>Grants and subsidies for reducing post-harvest crop loss.</td></tr>
+      <tr><td>Govt. & NGO partnerships</td><td>Grants and subsidies for reducing post-harvest crop loss.</td></tr>
       <tr><td>Data insights (anonymized)</td><td>Sold to agri-input companies and FPOs to help them plan demand and supply.</td></tr>
-    </tbody></table>
+    </table>
   </div>
 </section>
 
@@ -499,7 +530,7 @@
     <div class="team-grid">
       <div class="team-card">
         <span class="phase">Founding — Year 1</span>
-        <h3>Small &amp; Lean</h3>
+        <h3>Small & Lean</h3>
         <p>2–3 co-founders covering tech, operations, and farmer outreach. Keep it cheap and hands-on — talk to farmers directly first.</p>
       </div>
       <div class="team-card">
@@ -601,7 +632,7 @@
       <div class="contact-info">
         <div class="contact-row">
           <div class="ic">@</div>
-          <div><span class="lbl">Email</span><a href="mailto:gagnejarushal2609@gmail.com">gagnejarushal2609@gmail.com.com</a></div>
+          <div><span class="lbl">Email</span><a href="mailto:gagnejarushal2609@gmail.com">gagnejarushal2609@gmail.com</a></div>
         </div>
         <div class="contact-row">
           <div class="ic">☎</div>
@@ -615,8 +646,8 @@
 
       <form class="contact-form" id="contactForm">
         <div class="form-row">
-          <div><label for="name">Name</label><input id="name" name="name" type="text" required=""></div>
-          <div><label for="email">Email</label><input id="email" name="email" type="email" required=""></div>
+          <div><label for="name">Name</label><input id="name" name="name" type="text" required></div>
+          <div><label for="email">Email</label><input id="email" name="email" type="email" required></div>
         </div>
         <div class="full-row">
           <label for="reason">I'm reaching out about</label>
@@ -630,7 +661,7 @@
         </div>
         <div class="full-row">
           <label for="message">Message</label>
-          <textarea id="message" name="message" required="" placeholder="Tell us a bit about what you'd like to discuss..."></textarea>
+          <textarea id="message" name="message" required placeholder="Tell us a bit about what you'd like to discuss..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Send message</button>
         <p class="form-status" id="formStatus"></p>
@@ -682,6 +713,77 @@
   });
 </script>
 
+<!-- AI CHAT WIDGET -->
+<button id="chatToggle" aria-label="Open Kisan Setu assistant">💬</button>
+<div id="chatPanel">
+  <div class="chat-head">
+    <strong>Kisan Setu Assistant</strong>
+    <span>Ask about crops, storage, or mandi prices</span>
+  </div>
+  <div class="chat-body" id="chatBody">
+    <div class="chat-msg bot">Namaste! Ask me anything about crops, farming practices, or storage — I'm here to help.</div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Type your question..." />
+    <button id="chatSend">Send</button>
+  </div>
+</div>
 
+<script>
+  // ---- Chat widget wiring ----
+  // Live backend, deployed on Render.
+  const CHAT_API_URL = "https://kisan-setu-backend-km3f.onrender.com/api/chat";
 
-</body></html>
+  const chatToggle = document.getElementById('chatToggle');
+  const chatPanel = document.getElementById('chatPanel');
+  const chatBody = document.getElementById('chatBody');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+
+  chatToggle.addEventListener('click', () => {
+    chatPanel.classList.toggle('open');
+    if (chatPanel.classList.contains('open')) chatInput.focus();
+  });
+
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + type;
+    div.textContent = text;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    addMessage(message, 'user');
+    chatInput.value = '';
+    chatSend.disabled = true;
+
+    try {
+      const res = await fetch(CHAT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        addMessage(data.error || 'Something went wrong. Try again.', 'error');
+      } else {
+        addMessage(data.reply, 'bot');
+      }
+    } catch (err) {
+      addMessage("Couldn't reach the assistant server. Is it running?", 'error');
+    } finally {
+      chatSend.disabled = false;
+    }
+  }
+
+  chatSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+
+</body>
+</html>
